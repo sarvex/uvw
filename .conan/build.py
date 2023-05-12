@@ -10,12 +10,10 @@ from cpt.packager import ConanMultiPackager
 def get_version():
     with open("CMakeLists.txt") as cmake:
         content = cmake.read()
-        match = re.search(r'project\(uvw VERSION (.*)\)', content)
-        if match:
-            return match.group(1)
+        if match := re.search(r'project\(uvw VERSION (.*)\)', content):
+            return match[1]
         tag_version = os.getenv("GITHUB_REF")
-        package_version = tag_version.replace("refs/tags/v", "")
-        return package_version
+        return tag_version.replace("refs/tags/v", "")
 
 def get_username():
     return os.getenv("CONAN_USERNAME", "skypjack")
@@ -24,12 +22,12 @@ def get_username():
 def get_reference():
     version = get_version()
     username = get_username()
-    return "uvw/{}@{}/stable".format(version, username)
+    return f"uvw/{version}@{username}/stable"
 
 
 def get_upload():
     username = get_username()
-    url = "https://api.bintray.com/conan/{}/conan".format(username)
+    url = f"https://api.bintray.com/conan/{username}/conan"
     default_upload = url if os.getenv("GITHUB_REF") else False
     return os.getenv("CONAN_UPLOAD", default_upload)
 
